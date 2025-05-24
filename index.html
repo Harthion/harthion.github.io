@@ -14,7 +14,7 @@
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #fff;
+            color: #fff;   
             min-height: 100vh;
         }
 
@@ -836,7 +836,7 @@
         };
 
         // Admin PIN
-        const ADMIN_PIN = '45098256';
+        const ADMIN_PIN = 'cat';
 
         // Show PIN modal
         function showPinModal() {
@@ -1126,39 +1126,45 @@
         function renderTimeSlots() {
             const timeSlotsContainer = document.getElementById('timeSlots');
             const selectedDate = document.getElementById('appointmentDate').value;
-            
+
             if (!selectedDate) {
                 timeSlotsContainer.innerHTML = '<p style="text-align: center; color: #ccc;">Please select a date</p>';
                 return;
             }
-            
+
             // Get barber's schedule for this date
             const daySchedule = barberSchedules[selectedDate];
-            
+
             if (!daySchedule || daySchedule.length === 0) {
                 timeSlotsContainer.innerHTML = '<p style="text-align: center; color: #ccc;">No available time slots for this date</p>';
                 return;
             }
-            
+
+            // Only show available slots (remove booked ones)
+            const availableSlots = daySchedule.filter(slot => slot.available);
+
+            if (availableSlots.length === 0) {
+                timeSlotsContainer.innerHTML = '<p style="text-align: center; color: #ccc;">No available time slots for this date</p>';
+                return;
+            }
+
             timeSlotsContainer.innerHTML = '';
-            
-            daySchedule.forEach(slot => {
-                if (slot.available) {
-                    const slotElement = document.createElement('div');
-                    slotElement.className = 'time-slot';
-                    
-                    const displayTime = new Date(`2000-01-01 ${slot.time}`).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    });
-                    
-                    slotElement.textContent = displayTime;
-                    slotElement.dataset.time = slot.time;
-                    slotElement.addEventListener('click', () => selectTimeSlot(slotElement, slot.time));
-                    
-                    timeSlotsContainer.appendChild(slotElement);
-                }
+
+            availableSlots.forEach(slot => {
+                const slotElement = document.createElement('div');
+                slotElement.className = 'time-slot';
+
+                const displayTime = new Date(`2000-01-01 ${slot.time}`).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                slotElement.textContent = displayTime;
+                slotElement.dataset.time = slot.time;
+                slotElement.addEventListener('click', () => selectTimeSlot(slotElement, slot.time));
+
+                timeSlotsContainer.appendChild(slotElement);
             });
         }
 

@@ -1132,7 +1132,6 @@
                 return;
             }
 
-            // Get barber's schedule for this date
             const daySchedule = barberSchedules[selectedDate];
 
             if (!daySchedule || daySchedule.length === 0) {
@@ -1141,7 +1140,40 @@
             }
 
             // Only show available slots (remove booked ones)
-            const availableSlots = daySchedule.filter(slot => slot.available);
+            let availableSlots = daySchedule.filter(slot => slot.available);
+
+            // If a service is selected, filter out slots that would overlap with the selected service's duration
+            if (selectedService) {
+                const duration = parseInt(selectedService.duration, 10);
+
+                availableSlots = availableSlots.filter(slot => {
+                    const slotStart = new Date(`2000-01-01T${slot.time}:00`);
+                    const slotEnd = new Date(slotStart.getTime() + duration * 60000);
+
+                    // Check for overlap with any other booked slot
+                    for (const s of daySchedule) {
+                        if (!s.available && s.time !== slot.time) {
+                            const bookedStart = new Date(`2000-01-01T${s.time}:00`);
+                            // Assume all booked slots use their booking's service duration, fallback to 30 min if missing
+                            const bookedDuration = s.booking && s.booking.service && s.booking.service.duration
+                                ? parseInt(s.booking.service.duration, 10)
+                                : 30;
+                            const bookedEnd = new Date(bookedStart.getTime() + bookedDuration * 60000);
+                            // If the slot overlaps with a booked slot, filter it out
+                            if (
+                                (slotStart < bookedEnd && slotEnd > bookedStart)
+                            ) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    // Also, if a slot would overlap with another available slot that is already selected, filter it out
+                    // (not needed for single selection, but logic is here for extensibility)
+
+                    return true;
+                });
+            }
 
             if (availableSlots.length === 0) {
                 timeSlotsContainer.innerHTML = '<p style="text-align: center; color: #ccc;">No available time slots for this date</p>';
@@ -1189,6 +1221,7 @@
                 };
                 
                 updateBookButton();
+                renderTimeSlots();
             });
         });
 

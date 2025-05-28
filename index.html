@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crown Cuts - Premium Barber Shop</title>
+    <title>Jblendzbooking - Premium Barber Shop</title>
     <style>
         * {
             margin: 0;
@@ -36,11 +36,11 @@
 
         .header h1 {
             font-size: 3rem;
-            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            background: linear-gradient(45deg, #fff, #ffed4a);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
         }
 
         .header p {
@@ -73,7 +73,7 @@
         .card-title {
             font-size: 1.8rem;
             margin-bottom: 20px;
-            color: #ffd700;
+            color: #fff;
             text-align: center;
         }
 
@@ -110,7 +110,7 @@
         }
 
         .service-price {
-            color: #ffd700;
+            color: #fff;
             font-weight: bold;
         }
 
@@ -121,7 +121,7 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #ffd700;
+            color: #fff;
             font-weight: bold;
         }
 
@@ -267,8 +267,8 @@
 
         .admin-btn {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            color: #ffd700;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
             padding: 8px 12px;
             border-radius: 20px;
             cursor: pointer;
@@ -387,8 +387,8 @@
 
         .back-to-customer {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            color: #ffd700;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
             padding: 8px 15px;
             border-radius: 20px;
             cursor: pointer;
@@ -565,7 +565,7 @@
         .stat-number {
             font-size: 2rem;
             font-weight: bold;
-            color: #ffd700;
+            color: #fff;
         }
 
         .stat-label {
@@ -581,9 +581,9 @@
         }
 
         .preset-btn {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            color: #ffd700;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
             padding: 8px 15px;
             border-radius: 20px;
             cursor: pointer;
@@ -594,6 +594,40 @@
         .preset-btn:hover {
             background: rgba(255, 215, 0, 0.2);
             transform: scale(1.05);
+        }
+
+        .admin-calendar {
+            background: rgba(255,255,255,0.04);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .admin-calendar h3 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        .admin-calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .admin-calendar-table th, .admin-calendar-table td {
+            padding: 8px 6px;
+            border-bottom: 1px solid rgba(255,215,0,0.08);
+            text-align: left;
+            color: #fff;
+        }
+        .admin-calendar-table th {
+            color: #fff;
+            background: rgba(255,215,0,0.05);
+        }
+        .admin-calendar-table td.booked {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        .admin-calendar-table td.unbooked {
+            color: #ccc;
+            font-style: italic;
         }
 
         @media (max-width: 768px) {
@@ -615,7 +649,7 @@
 <body>
     <div class="container">
         <div class="header fade-in">
-            <h1>👑 Crown Cuts</h1>
+            <h1>Jblendz</h1>
             <p>Premium Barber Experience - Book Your Perfect Cut</p>
         </div>
 
@@ -793,14 +827,17 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Admin Calendar -->
+                <div class="admin-calendar" id="adminCalendar" style="margin-top:30px;">
+                    <!-- Calendar will be rendered here -->
+                </div>
             </div>
         </div>
 
         <div class="barber-info fade-in">
             <div class="barber-avatar">MC</div>
             <h3>Jayden Hathaway</h3>
-            <p>15+ Years Experience | Certified Master Barber</p>
-            <p>"Every cut tells a story. Let me help you tell yours."</p>
         </div>
 
         <!-- Small Admin Access Button -->
@@ -936,6 +973,7 @@
             element.classList.add('selected');
             currentSelectedDay = date.toISOString().split('T')[0];
             displayCurrentSlots();
+            renderAdminCalendar();
         }
 
         // Apply preset schedules
@@ -1324,9 +1362,12 @@
             
             // Refresh time slots to show updated availability
             renderTimeSlots();
-            
+
             // Update admin stats if in admin panel
             updateAdminStats();
+
+            // Update admin calendar if in admin panel
+            renderAdminCalendar();
             
             // Simulate email confirmation
             setTimeout(() => {
@@ -1359,6 +1400,46 @@
         // Initialize the page
         initializeDefaultSchedule();
         renderTimeSlots();
+
+        // Add this function after displayCurrentSlots()
+        function renderAdminCalendar() {
+            const calendarDiv = document.getElementById('adminCalendar');
+            if (!currentSelectedDay || !barberSchedules[currentSelectedDay]) {
+                calendarDiv.innerHTML = '<h3>Day Bookings</h3><p style="color:#ccc;text-align:center;">No slots for this day.</p>';
+                return;
+            }
+            const slots = barberSchedules[currentSelectedDay];
+            let html = '<h3>Day Bookings</h3>';
+            if (!slots.length) {
+                html += '<p style="color:#ccc;text-align:center;">No slots for this day.</p>';
+            } else {
+                html += '<table class="admin-calendar-table"><thead><tr><th>Time</th><th>Status</th><th>Customer</th><th>Service</th></tr></thead><tbody>';
+                slots.forEach(slot => {
+                    const displayTime = new Date(`2000-01-01T${slot.time}:00`).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                    if (!slot.available && slot.booking) {
+                        html += `<tr>
+                            <td>${displayTime}</td>
+                            <td class="booked">Booked</td>
+                            <td>${slot.booking.customerName}</td>
+                            <td>${slot.booking.service ? slot.booking.service.name : ''}</td>
+                        </tr>`;
+                    } else {
+                        html += `<tr>
+                            <td>${displayTime}</td>
+                            <td class="unbooked">Available</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>`;
+                    }
+                });
+                html += '</tbody></table>';
+            }
+            calendarDiv.innerHTML = html;
+        }
     </script>
 </body>
 </html>

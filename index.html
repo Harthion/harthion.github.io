@@ -664,12 +664,16 @@
             <div class="booking-section">
                 <div class="services-card fade-in">
                     <h2 class="card-title">Our Services</h2>
-                    <div class="service-item" data-service="classic" data-duration="30" data-price="25">
+                    <div class="service-item" data-service="classic" data-duration="30" data-price="25" id="classicCutService">
                         <div>
                             <div class="service-name">Classic Cut</div>
                             <div class="service-duration">30 minutes</div>
                         </div>
                         <div class="service-price">$25</div>
+                    </div>
+                    <!-- Classic Cut Preview Image (hidden by default) -->
+                    <div id="classicCutPreview" style="display:none; text-align:center; margin: 10px 0;">
+                        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD... (truncated for brevity, use your actual base64 or file path)" alt="Classic Cut Example" style="max-width:100%;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.2);margin-top:10px;">
                     </div>
                     <div class="service-item" data-service="premium" data-duration="45" data-price="35">
                         <div>
@@ -1440,6 +1444,19 @@
             }
             calendarDiv.innerHTML = html;
         }
+
+        // Show/hide classic cut preview image on selection
+        document.querySelectorAll('.service-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Classic Cut preview logic
+                const classicPreview = document.getElementById('IMG_2523.jpeg');
+                if (item.dataset.service === 'classic') {
+                    classicPreview.style.display = 'block';
+                } else {
+                    classicPreview.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>
